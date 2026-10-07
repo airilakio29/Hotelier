@@ -1,16 +1,25 @@
 <?php
 // api/booking_create.php
 // Creates a booking. JS sends: { guestName, email, roomType, checkin, checkout, nights, rate, total }
-// We resolve roomID and guestID/userID from the DB.
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
-require_once 'db.php';
+// Resolves roomID and guestID/userID from the DB.
 
-$data = json_decode(file_get_contents('php://input'), true);
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+require_once __DIR__ . '/db.php';
+
+$rawInput = file_get_contents('php://input');
+$data = json_decode($rawInput, true);
 
 if (!$data) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Invalid input data']);
     exit;
 }
@@ -22,16 +31,23 @@ $checkInDate  = trim($data['checkin']    ?? '');
 $checkOutDate = trim($data['checkout']   ?? '');
 
 if (empty($email) || empty($roomType) || empty($checkInDate) || empty($checkOutDate)) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing required booking fields.']);
     exit;
 }
 
 try {
-    // 1. Look up guestID by email
+    // 1. Look up guestID by email, or create guest profile if booking directly
     $stmtG = $pdo->prepare("SELECT guestID FROM `Guest` WHERE email = ?");
     $stmtG->execute([$email]);
     $guestRow = $stmtG->fetch();
     $guestID  = $guestRow ? (int)$guestRow['guestID'] : null;
+
+    if (!$guestID && !empty($guestName)) {
+        $stmtGCreate = $pdo->prepare("INSERT INTO `Guest` (fullName, email, phoneNumber) VALUES (?, ?, ?)");
+        $stmtGCreate->execute([$guestName, $email, 'N/A']);
+        $guestID = (int)$pdo->lastInsertId();
+    }
 
     // 2. Find an available room of the requested type by roomNumber
     $stmtR = $pdo->prepare(
@@ -54,6 +70,7 @@ try {
     }
 
     if (!$roomRow) {
+        http_response_code(404);
         echo json_encode(['success' => false, 'error' => 'No room found for the selected type.']);
         exit;
     }
@@ -61,7 +78,7 @@ try {
     $roomID     = (int)$roomRow['roomID'];
     $roomNumber = (int)$roomRow['roomNumber'];
 
-    // 3. Look up userID by email
+    // 3. Look up userID by email (if registered user)
     $stmtU = $pdo->prepare("SELECT userID FROM `User` WHERE username = ?");
     $stmtU->execute([$email]);
     $userRow = $stmtU->fetch();
@@ -86,6 +103,8 @@ try {
     ]);
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => 'Failed to create booking: ' . $e->getMessage()]);
+    error_log('booking_create error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Failed to create booking. Please try again.']);
 }
 ?>
