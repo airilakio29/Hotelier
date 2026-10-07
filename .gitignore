@@ -1,0 +1,21 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Vercel deployment artifacts
+.vercel
+
+# Node dependencies (if any)
+node_modules/
+npm-debug.log*
+
+# Local scratch & dev servers
+server.js
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
