@@ -1,5 +1,13 @@
 <?php
+// dump_schema.php - CLI utility only
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    die('Forbidden: Schema dump is only available via CLI.');
+}
+
 require_once __DIR__ . '/api/db.php';
+
 try {
     $tables = ['Booking', 'Facilities', 'Guest', 'Room', 'Transaction', 'User'];
     $schema = "";
@@ -14,5 +22,5 @@ try {
     }
     echo $schema;
 } catch (Exception $e) {
-    echo "ERROR: " . $e->getMessage();
+    echo "ERROR: " . $e->getMessage() . "\n";
 }

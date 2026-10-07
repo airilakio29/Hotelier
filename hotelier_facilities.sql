@@ -1,6 +1,6 @@
 -- ================================================================
 -- HOTELIER — Facilities Seed Data (MySQL 5.7 Compatible)
--- Database : 4748018_hotelier
+-- Database schema seed file
 -- ================================================================
 -- Facilities table columns:
 --   facilID    INT  AUTO_INCREMENT PRIMARY KEY  (DB assigns 1-6)
