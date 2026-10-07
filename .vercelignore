@@ -1,0 +1,23 @@
+# Database migration and seed files
+*.sql
+hotelier.sql
+hotelier_rooms.sql
+hotelier_facilities.sql
+database_setup.sql
+
+# Non-runtime diagnostics and utilities
+dump_schema.php
+server.js
+
+# Documentation
+README.md
+
+# Environment and secrets
+.env*
+*.env
+
+# Version control & IDE configs
+.git
+.gitignore
+.vscode
+.idea
