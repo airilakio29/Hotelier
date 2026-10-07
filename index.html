@@ -422,14 +422,24 @@
         <p class="form-hint">Demo: any email / password will work.</p>
       </form>
 
-      <!-- Guest quick-access -->
+      <!-- Quick Demo Access -->
       <div class="auth-divider" aria-hidden="true">
-        <span>or</span>
+        <span>or quick demo access</span>
       </div>
-      <button id="btn-guest-access" class="btn btn-guest btn-full"
-        aria-label="Continue browsing as a guest without signing in">
-        Continue as Guest
-      </button>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button type="button" id="btn-guest-access" class="btn btn-guest" style="flex:1"
+          aria-label="Continue browsing as a guest in demo mode">
+          Guest Demo
+        </button>
+        <button type="button" id="btn-staff-access" class="btn btn-guest" style="flex:1"
+          aria-label="Access staff workspace in demo mode">
+          Staff Demo
+        </button>
+        <button type="button" id="btn-admin-access" class="btn btn-guest" style="flex:1"
+          aria-label="Access admin dashboard in demo mode">
+          Admin Demo
+        </button>
+      </div>
     </div>
 
     <!-- Register Panel -->
