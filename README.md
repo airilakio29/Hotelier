@@ -74,3 +74,36 @@ Administrators have access to everything staff members do, plus high-level analy
 - **Modals:** The application heavily utilizes modal overlays. You can close them by clicking the `X` button, clicking anywhere outside the modal box, or pressing the `Escape` key.
 - **Session Handling:** After a successful login, the top navigation replaces the hero 'Sign In' and floating CTA buttons. Your role dictates what links appear in the navigation bar.
 - **Logout:** Use the **Log Out** button on the top right to end your session. This resets the workspace to the default guest-facing landing page.
+
+---
+
+## 4. Deploying to Vercel
+
+Hotelier is configured for zero-configuration deployment to [Vercel](https://vercel.com) using the community `vercel-php@0.9.0` serverless runtime.
+
+### 1. Database Setup
+1. Create a MySQL database (e.g. free cloud database on [TiDB Cloud](https://tidbcloud.com) or any remote MySQL provider).
+2. Import the unified migration script:
+   ```bash
+   mysql -u <USER> -h <HOST> -P <PORT> -p --ssl-mode=VERIFY_IDENTITY < database_setup.sql
+   ```
+   *Note: This script seeds 100 rooms, 6 facilities, and default demo accounts (`guest@hotelier.com` / `guest123`, `staff@hotelier.com` / `staff123`, `admin@hotelier.com` / `admin123`).*
+
+### 2. Vercel Configuration
+1. Import the repository in Vercel.
+2. Select branch `vercel-deploy`.
+3. Set **Framework Preset** to **`Other`** (no build command, no output directory override).
+4. In **Project Settings → Environment Variables**, add:
+   - `DB_HOST`: Database hostname (e.g., `gateway01.ap-southeast-1.prod.aws.tidbcloud.com`)
+   - `DB_PORT`: Database port (e.g., `4000` or `3306`)
+   - `DB_NAME`: Database name
+   - `DB_USER`: Database username
+   - `DB_PASSWORD`: Database password
+   - `DB_SSL`: `true` (enables SSL encryption for cloud MySQL)
+5. Deploy!
+
+### 3. Demo Mode Fallback
+If deployed without environment variables or while the database is unreachable, the application automatically operates in **Demo Mode**:
+- Quick-access buttons for Guest, Staff, and Admin roles.
+- Interactive 100-room live grid, room status updates, bookings, invoices, and analytics dashboards all work client-side.
+
